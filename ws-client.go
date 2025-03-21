@@ -11,17 +11,20 @@ import (
 
 type Message struct {
 	ClientID string `json:"clientID"`
+	Username string `json:"username"`
 	Text     string `json:"text"`
+	IsAdmin  bool   `json:"isAdmin"`
 }
 
 type WSClient struct {
-	ID     string
-	wsconn *websocket.Conn
-	room   *ChatRoom
+	ID       string
+	username string
+	wsconn   *websocket.Conn
+	room     *ChatRoom
 }
 
-func NewWSClient(id string, wsconn *websocket.Conn, hub *ChatRoom) *WSClient {
-	return &WSClient{ID: id, wsconn: wsconn, room: hub}
+func NewWSClient(userId string, username string, wsconn *websocket.Conn, hub *ChatRoom) *WSClient {
+	return &WSClient{ID: userId, username: username, wsconn: wsconn, room: hub}
 }
 
 func (c *WSClient) HandleWSConnection() {
@@ -51,8 +54,7 @@ func (c *WSClient) WSReader() {
 		if err != nil {
 			c.room.unregister <- c
 		}
-		message := &Message{}
-		message.ClientID = c.ID
+		message := &Message{ClientID: c.ID, Username: c.username, IsAdmin: false}
 		reader := bytes.NewReader(wsmsg)
 		decoder := json.NewDecoder(reader)
 		err = decoder.Decode(&message)

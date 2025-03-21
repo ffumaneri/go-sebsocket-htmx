@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"sync"
 )
@@ -14,7 +15,7 @@ type ChatRoom struct {
 	mutex        sync.RWMutex
 }
 
-func NewHub() *ChatRoom {
+func Room() *ChatRoom {
 	return &ChatRoom{
 		clients:      make(map[string]*WSClient),
 		incomingChan: make(chan Message, 256),
@@ -34,6 +35,8 @@ func (h *ChatRoom) Run() {
 			h.mutex.Lock()
 			h.clients[client.ID] = client
 			h.mutex.Unlock()
+			msg := Message{ClientID: client.ID, Username: "Admin", Text: fmt.Sprintf("%s has joined", client.username), IsAdmin: true}
+			h.incomingChan <- msg
 		case client, ok := <-h.unregister:
 			if !ok {
 				return

@@ -22,9 +22,9 @@
   <ul id="chat_room" hx-swap="beforeend" hx-swap-oob="beforeend">
   </ul>
 </div>
-<div class="bg-gray-100" id="content">
+<div class="flex bg-gray-100" id="content">
   <form hx-post="/save-username" hx-swap="innerHTML" hx-target="#content" hx-trigger="submit">
-    <label for="username">Enter your username:</label>
+    <label for="username" class="">Enter your username:</label>
     <input id= "username" name="username" type="text" class="border-2 border-gray-300 p-2" placeholder="Type your username">
     <button type="submit" class="bg-blue-500 text-white px-4 py-2">Save</button>
   </form>
