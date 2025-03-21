@@ -51,7 +51,6 @@ func (c *WSClient) WSReader() {
 		if err != nil {
 			c.room.unregister <- c
 		}
-
 		message := &Message{}
 		message.ClientID = c.ID
 		reader := bytes.NewReader(wsmsg)

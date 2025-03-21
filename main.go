@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
+	"html/template"
 	"log"
 	"net/http"
+	"strings"
 )
 
 var upgrader = websocket.Upgrader{
@@ -16,7 +17,20 @@ var upgrader = websocket.Upgrader{
 func homePage(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "templates/index.html")
 }
-func wsHandler(hub *ChatRoom, w http.ResponseWriter, r *http.Request) {
+func saveUsername(w http.ResponseWriter, r *http.Request) {
+	username := r.PostFormValue("username")
+	tmpl, err := template.ParseFiles("templates/chat.html")
+	if err != nil {
+		log.Fatalf("template parsing: %s", err)
+	}
+
+	// Render the template with the message as data.
+	err = tmpl.Execute(w, map[string]string{"username": username})
+	if err != nil {
+		log.Fatalf("template execution: %s", err)
+	}
+}
+func wsHandler(hub *ChatRoom, userId string, w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println("Upgrade error:", err)
@@ -25,7 +39,7 @@ func wsHandler(hub *ChatRoom, w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Client connected")
 
-	wsClient := NewWSClient(uuid.New().String(), conn, hub)
+	wsClient := NewWSClient(userId, conn, hub)
 	go wsClient.HandleWSConnection()
 }
 
@@ -33,8 +47,13 @@ func main() {
 	hub := NewHub()
 	go hub.Run()
 	http.HandleFunc("/", homePage)
-	http.HandleFunc("/ws", func(writer http.ResponseWriter, request *http.Request) {
-		wsHandler(hub, writer, request)
+	http.HandleFunc("POST /save-username", saveUsername)
+	http.HandleFunc("/ws/", func(writer http.ResponseWriter, r *http.Request) {
+		path := r.URL.Path                // Get the entire path
+		parts := strings.Split(path, "/") // Split the path into parts
+		if len(parts) >= 3 {
+			wsHandler(hub, parts[2], writer, r)
+		}
 	})
 	log.Println("Listening on port 8080")
 	err := http.ListenAndServe(":8080", nil)

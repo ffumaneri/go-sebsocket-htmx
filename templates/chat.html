@@ -1,0 +1,6 @@
+<div hx-ext="ws" ws-connect="/ws/{{ .username }}" class="bg-gray-100">
+  <form id="form" ws-send hx-reset-on-success>
+    <input name="text" type="text" class="border-2 border-gray-300 p-2" placeholder="Type your message">
+    <button type="submit" class="bg-blue-500 text-white px-4 py-2">Send</button>
+  </form>
+</div>

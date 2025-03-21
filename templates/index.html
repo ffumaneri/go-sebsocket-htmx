@@ -17,19 +17,17 @@
 </head>
 
 <body>
-<h1 class="text-3xl text-center p-4">Chat</h1>
-<div hx-ext="ws" ws-connect="/ws">
-  <div class="flex bg-gray-100 p-4">
-    <ul id="chat_room" hx-swap="beforeend" hx-swap-oob="beforeend">
-    </ul>
-  </div>
-
-  <form id="form" ws-send hx-reset-on-success>
-    <input name="text" type="text" class="border-2 border-gray-300 p-2" placeholder="Type your message"
-    >
-    <button type="submit" class="bg-blue-500 text-white px-4 py-2">Send</button>
+<h1 class="text-3xl text-center">Chat</h1>
+<div class="flex bg-gray-100">
+  <ul id="chat_room" hx-swap="beforeend" hx-swap-oob="beforeend">
+  </ul>
+</div>
+<div class="bg-gray-100" id="content">
+  <form hx-post="/save-username" hx-swap="innerHTML" hx-target="#content" hx-trigger="submit">
+    <label for="username">Enter your username:</label>
+    <input id= "username" name="username" type="text" class="border-2 border-gray-300 p-2" placeholder="Type your username">
+    <button type="submit" class="bg-blue-500 text-white px-4 py-2">Save</button>
   </form>
 </div>
 </body>
-
 </html>
